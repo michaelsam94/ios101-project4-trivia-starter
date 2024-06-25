@@ -9,12 +9,30 @@ import UIKit
 
 class MultiLineButton: UIButton {
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    // MARK: - Init
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        self.commonInit()
     }
-    */
+
+    private func commonInit() {
+        self.titleLabel?.numberOfLines = 0
+        self.titleLabel?.lineBreakMode = .byWordWrapping
+    }
+
+    // MARK: - Overrides
+
+    override var intrinsicContentSize: CGSize {
+        titleLabel?.intrinsicContentSize ?? .zero
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLabel?.preferredMaxLayoutWidth = titleLabel?.frame.size.width ?? 0
+        super.layoutSubviews()
+    }
 
 }
+

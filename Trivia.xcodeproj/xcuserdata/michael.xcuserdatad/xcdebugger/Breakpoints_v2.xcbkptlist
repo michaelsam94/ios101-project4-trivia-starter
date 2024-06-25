@@ -14,9 +14,9 @@
             filePath = "Trivia/TriviaService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
-            landmarkName = "fetchTrivia(withAmount:withType:completion:)"
+            startingLineNumber = "52"
+            endingLineNumber = "52"
+            landmarkName = "fetchTrivia(withAmount:withDiffculty:withCategory:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

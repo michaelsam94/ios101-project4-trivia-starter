@@ -10,10 +10,16 @@ import Foundation
 
 class TriviaService {
     
-    static func fetchTrivia(withAmount amount: Int,completion: ((TriviaApiResponse) -> Void)? = nil) {
+    static func fetchTrivia(withAmount amount: Int,withDiffculty difficulty: String,withCategory category: Int,completion: ((TriviaApiResponse) -> Void)? = nil) {
         
         let baseUrl = "https://opentdb.com/api.php"
-        let parms = "amount=\(amount)"
+        var parms = "amount=\(amount)"
+        if difficulty != Difficulty.all.rawValue {
+            parms.append("&difficulty=\(difficulty)")
+        }
+        if category != Category.all.numericCode {
+            parms.append("&category=\(category)")
+        }
         let url = URL(string: "\(baseUrl)?\(parms)")!
         let task = URLSession.shared.dataTask(with: url) { data,response,error in
             guard error == nil else {

@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+
+let kCategoryKey = "categoryKey"
+let kDifficultyKey = "diffcultyKey"
+

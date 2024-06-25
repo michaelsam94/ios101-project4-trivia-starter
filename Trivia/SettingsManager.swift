@@ -9,7 +9,7 @@ import Foundation
 
 
 class SettingsManager {
-    private var settings = Settings(category: .all, difficulty: .all)
+    var settings = Settings(category: .all, difficulty: .all)
     
     static let shared = SettingsManager()
     

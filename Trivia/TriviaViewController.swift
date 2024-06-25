@@ -7,7 +7,21 @@
 
 import UIKit
 
-class TriviaViewController: UIViewController {
+extension UIViewController {
+    func addGradient() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = view.bounds
+        gradientLayer.colors = [
+            UIColor(red: 0.54, green: 0.88, blue: 0.99, alpha: 1.00).cgColor,
+            UIColor(red: 0.51, green: 0.81, blue: 0.97, alpha: 1.00).cgColor,
+        ]
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
+        view.layer.insertSublayer(gradientLayer, at: 0)
+    }
+}
+
+class TriviaViewController: UIViewController, SettingsViewControllerDelegate {
 
     @IBOutlet weak var currentQuestionNumberLabel: UILabel!
     @IBOutlet weak var questionContainerView: UIView!
@@ -22,17 +36,29 @@ class TriviaViewController: UIViewController {
     private var currQuestionIndex = 0
     private var numCorrectQuestions = 0
 
+    private let segueIdentifier = "showSettingsSegue"
+
     override func viewDidLoad() {
         super.viewDidLoad()
         addGradient()
         questionContainerView.layer.cornerRadius = 8.0
         // TODO: FETCH TRIVIA QUESTIONS HERE
-        getQuestions(withAmount: 10)
+        getQuestions(
+            withAmount: 10,
+            withDifficult: SettingsManager.shared.settings.difficulty.rawValue,
+            withCategory: SettingsManager.shared.settings.category.numericCode
+        )
 
     }
 
-    private func getQuestions(withAmount amount: Int) {
-        TriviaService.fetchTrivia(withAmount: amount) { response in
+    private func getQuestions(
+        withAmount amount: Int,
+        withDifficult difficult: String = Difficulty.all.rawValue,
+        withCategory category: Int = Category.all.numericCode
+    ) {
+        TriviaService.fetchTrivia(
+            withAmount: amount, withDiffculty: difficult, withCategory: category
+        ) { response in
             self.questions = response.results
             self.updateQuestion(withQuestionIndex: 0)
         }
@@ -90,22 +116,27 @@ class TriviaViewController: UIViewController {
         let resetAction = UIAlertAction(title: "Restart", style: .default) { [unowned self] _ in
             currQuestionIndex = 0
             numCorrectQuestions = 0
-            getQuestions(withAmount: 10)
+            getQuestions(
+                withAmount: 10,
+                withDifficult: SettingsManager.shared.settings.difficulty.rawValue,
+                withCategory: SettingsManager.shared.settings.category.numericCode
+            )
         }
         alertController.addAction(resetAction)
         present(alertController, animated: true, completion: nil)
     }
 
-    private func addGradient() {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = view.bounds
-        gradientLayer.colors = [
-            UIColor(red: 0.54, green: 0.88, blue: 0.99, alpha: 1.00).cgColor,
-            UIColor(red: 0.51, green: 0.81, blue: 0.97, alpha: 1.00).cgColor,
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
-        view.layer.insertSublayer(gradientLayer, at: 0)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard segue.identifier == segueIdentifier else { return }
+        let settingsViewController = segue.destination as! SettingsViewController
+        settingsViewController.delegate = self
+    }
+
+    func didChangeSettings(with settings: Settings) {
+        getQuestions(
+            withAmount: 10, withDifficult: settings.difficulty.rawValue,
+            withCategory: settings.category.numericCode
+        )
     }
 
     @IBAction func didTapAnswerButton0(_ sender: UIButton) {
@@ -123,4 +154,9 @@ class TriviaViewController: UIViewController {
     @IBAction func didTapAnswerButton3(_ sender: UIButton) {
         updateToNextQuestion(answer: sender.titleLabel?.text ?? "")
     }
+
+    @IBAction func diidSettingsButtonTab(_ sender: UIButton) {
+        performSegue(withIdentifier: segueIdentifier, sender: nil)
+    }
+
 }
